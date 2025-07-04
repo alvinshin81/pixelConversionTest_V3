@@ -53,6 +53,41 @@ function showResult(message, isSuccess = true) {
     }, 10000);
 }
 
+// 복수 입력값 파싱 함수
+function parseMultipleValues(value) {
+    if (!value || value.trim() === '') return [];
+    return value.split(',').map(item => item.trim()).filter(item => item !== '');
+}
+
+// 상품 필드 유효성 검증 함수
+function validateProductFields() {
+    const productIdValue = document.getElementById('productId').value.trim();
+    const productNameValue = document.getElementById('productName').value.trim();
+    const productQuantityValue = document.getElementById('productQuantity').value.trim();
+    const productPriceValue = document.getElementById('productPrice').value.trim();
+    
+    // 비어있는 필드는 검증하지 않음
+    const fields = [];
+    if (productIdValue) fields.push({ name: '상품 ID', values: parseMultipleValues(productIdValue) });
+    if (productNameValue) fields.push({ name: '상품명', values: parseMultipleValues(productNameValue) });
+    if (productQuantityValue) fields.push({ name: '상품 수량', values: parseMultipleValues(productQuantityValue) });
+    if (productPriceValue) fields.push({ name: '상품 가격', values: parseMultipleValues(productPriceValue) });
+    
+    if (fields.length === 0) return true; // 모든 필드가 비어있으면 유효
+    
+    // 첫 번째 필드의 개수를 기준으로 검증
+    const expectedCount = fields[0].values.length;
+    
+    for (let i = 1; i < fields.length; i++) {
+        if (fields[i].values.length !== expectedCount) {
+            alert(`상품 정보 입력 오류: 모든 상품 필드의 개수가 일치해야 합니다.\n${fields[0].name}: ${expectedCount}개\n${fields[i].name}: ${fields[i].values.length}개`);
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 // 입력값 수집 함수
 function collectInputData() {
     return {
@@ -62,42 +97,103 @@ function collectInputData() {
         keyword: document.getElementById('keywordValue').value.trim(),
         productId: document.getElementById('productId').value.trim(),
         productName: document.getElementById('productName').value.trim(),
-        productQuantity: document.getElementById('productQuantity').value,
-        productPrice: document.getElementById('productPrice').value,
-        totalQuantity: document.getElementById('totalQuantity').value,
-        totalPrice: document.getElementById('totalPrice').value,
+        productQuantity: document.getElementById('productQuantity').value.trim(),
+        productPrice: document.getElementById('productPrice').value.trim(),
         currency: document.getElementById('currency').value
     };
 }
 
-// 상품 데이터 객체 생성
+// 상품 데이터 객체 생성 (복수 상품 지원)
 function createProductData(data) {
-    let productData = {};
+    const productIds = parseMultipleValues(data.productId);
+    const productNames = parseMultipleValues(data.productName);
+    const productQuantities = parseMultipleValues(data.productQuantity);
+    const productPrices = parseMultipleValues(data.productPrice);
     
-    if (data.productId) productData.id = data.productId;
-    if (data.productName) productData.name = data.productName;
-    if (data.productQuantity) productData.quantity = data.productQuantity;
-    if (data.productPrice) productData.price = data.productPrice;
+    // 단일 상품인 경우 기존 방식 유지
+    if (productIds.length <= 1) {
+        let productData = {};
+        
+        if (data.productId) productData.id = data.productId;
+        if (data.productName) productData.name = data.productName;
+        if (data.productQuantity) productData.quantity = data.productQuantity;
+        if (data.productPrice) productData.price = data.productPrice;
+        if (data.tag) productData.tag = data.tag;
+        
+        return Object.keys(productData).length > 0 ? productData : null;
+    }
+    
+    // 복수 상품인 경우 첫 번째 상품만 반환 (기존 이벤트 호환성 유지)
+    let productData = {};
+    if (productIds[0]) productData.id = productIds[0];
+    if (productNames[0]) productData.name = productNames[0];
+    if (productQuantities[0]) productData.quantity = productQuantities[0];
+    if (productPrices[0]) productData.price = productPrices[0];
     if (data.tag) productData.tag = data.tag;
     
     return Object.keys(productData).length > 0 ? productData : null;
 }
 
-// 구매 데이터 객체 생성
+// 총 수량/가격 계산 함수
+function calculateTotals(data) {
+    const productQuantities = parseMultipleValues(data.productQuantity);
+    const productPrices = parseMultipleValues(data.productPrice);
+    
+    let totalQuantity = 0;
+    let totalPrice = 0;
+    
+    // 수량 합산
+    productQuantities.forEach(qty => {
+        const num = parseFloat(qty);
+        if (!isNaN(num)) totalQuantity += num;
+    });
+    
+    // 가격 합산
+    productPrices.forEach(price => {
+        const num = parseFloat(price);
+        if (!isNaN(num)) totalPrice += num;
+    });
+    
+    return {
+        totalQuantity: totalQuantity > 0 ? totalQuantity : null,
+        totalPrice: totalPrice > 0 ? totalPrice : null
+    };
+}
+
+// 구매 데이터 객체 생성 (복수 상품 지원)
 function createPurchaseData(data) {
     let purchaseData = {};
     
-    if (data.totalQuantity) purchaseData.total_quantity = data.totalQuantity;
-    if (data.totalPrice) purchaseData.total_price = data.totalPrice;
+    // 총 수량/가격 계산
+    const totals = calculateTotals(data);
+    if (totals.totalQuantity) purchaseData.total_quantity = totals.totalQuantity;
+    if (totals.totalPrice) purchaseData.total_price = totals.totalPrice;
     if (data.currency) purchaseData.currency = data.currency;
     
-    // 상품 정보가 있으면 추가
-    const productData = createProductData(data);
-    if (productData && productData.id) {
-        // tag를 제거하고 products 배열에 추가
-        const productInfo = { ...productData };
-        delete productInfo.tag;
-        purchaseData.products = [productInfo];
+    // 복수 상품 정보 처리
+    const productIds = parseMultipleValues(data.productId);
+    const productNames = parseMultipleValues(data.productName);
+    const productQuantities = parseMultipleValues(data.productQuantity);
+    const productPrices = parseMultipleValues(data.productPrice);
+    
+    if (productIds.length > 0) {
+        const products = [];
+        
+        for (let i = 0; i < productIds.length; i++) {
+            const product = {};
+            if (productIds[i]) product.id = productIds[i];
+            if (productNames[i]) product.name = productNames[i];
+            if (productQuantities[i]) product.quantity = productQuantities[i];
+            if (productPrices[i]) product.price = productPrices[i];
+            
+            if (Object.keys(product).length > 0) {
+                products.push(product);
+            }
+        }
+        
+        if (products.length > 0) {
+            purchaseData.products = products;
+        }
     }
     
     if (data.tag) purchaseData.tag = data.tag;
@@ -123,6 +219,11 @@ function executeEvent() {
     
     if (!data.eventType) {
         showResult('오류: 이벤트 타입을 선택해주세요.', false);
+        return;
+    }
+    
+    // 상품 필드 유효성 검증
+    if (!validateProductFields()) {
         return;
     }
     
