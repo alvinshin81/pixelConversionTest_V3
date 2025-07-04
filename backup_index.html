@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카카오 픽셀 이벤트 테스트</title>
+    <link rel="icon" type="image/png" href="rsc/qaThumb.png">
+    <script type="text/javascript" src="//t1.daumcdn.net/kas/static/kp.dev.min.js" async></script>
+    <link rel="stylesheet" href="css/basic.css">
+</head>
+<body>
+    <!-- 상단 고정 헤더 -->
+    <div class="fixed-header">
+        <div class="header-content">
+            <h1>
+                카카오 픽셀 이벤트 테스트
+                <img src="rsc/alvin.png" alt="Profile" class="header-profile">
+            </h1>
+            <!-- 결과 표시 -->
+            <div id="result" class="result">
+                <h3>실행 결과</h3>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Track ID 설정 -->
+        <div class="section">
+            <h2>기본 설정</h2>
+            <div class="form-group">
+                <label for="trackId">Track ID <span class="required">*</span></label>
+                <input type="number" id="trackId" name="trackId" placeholder="트랙 ID를 입력하세요.(필수)" required>
+            </div>
+        </div>
+
+        <!-- 페이지 뷰 이벤트 -->
+        <div class="section">
+            <h2>페이지 뷰 이벤트</h2>
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="pageViewTag">
+                    <label for="pageViewTag">태그 추가</label>
+                </div>
+                <div id="pageViewOptional" class="optional-fields">
+                    <div class="form-group">
+                        <label for="pageViewTagValue">태그 값</label>
+                        <input type="text" id="pageViewTagValue" placeholder="태그 값을 입력하세요">
+                    </div>
+                </div>
+            </div>
+            <button onclick="triggerPageView()">페이지 뷰 이벤트 실행</button>
+        </div>
+
+        <!-- 회원가입 이벤트 -->
+        <div class="section">
+            <h2>회원가입 이벤트</h2>
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="signupTag">
+                    <label for="signupTag">태그 추가</label>
+                </div>
+                <div id="signupOptional" class="optional-fields">
+                    <div class="form-group">
+                        <label for="signupTagValue">태그 값</label>
+                        <input type="text" id="signupTagValue" placeholder="태그 값을 입력하세요">
+                    </div>
+                </div>
+            </div>
+            <button onclick="triggerSignup()">회원가입 이벤트 실행</button>
+        </div>
+
+        <!-- 검색 이벤트 -->
+        <div class="section">
+            <h2>검색 이벤트</h2>
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="searchKeyword">
+                    <label for="searchKeyword">키워드 추가</label>
+                </div>
+                <div id="searchOptional" class="optional-fields">
+                    <div class="form-group">
+                        <label for="searchKeywordValue">검색 키워드</label>
+                        <input type="text" id="searchKeywordValue" placeholder="검색 키워드를 입력하세요">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="searchTag">
+                    <label for="searchTag">태그 추가</label>
+                </div>
+                <div id="searchTagOptional" class="optional-fields">
+                    <div class="form-group">
+                        <label for="searchTagValue">태그 값</label>
+                        <input type="text" id="searchTagValue" placeholder="태그 값을 입력하세요">
+                    </div>
+                </div>
+            </div>
+            <button onclick="triggerSearch()">검색 이벤트 실행</button>
+        </div>
+
+        <!-- 장바구니 추가 이벤트 -->
+        <div class="section">
+            <h2>장바구니 추가 이벤트</h2>
+            <div class="form-group">
+                <label>실행 조건을 선택하세요:</label>
+                <div class="checkbox-group">
+                    <input type="radio" name="cartCondition" value="productOnly" id="cartProductOnly">
+                    <label for="cartProductOnly">상품고유값만 추가</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="radio" name="cartCondition" value="productAndTag" id="cartProductAndTag">
+                    <label for="cartProductAndTag">상품고유값 + 태그 추가</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="radio" name="cartCondition" value="eventOnly" id="cartEventOnly">
+                    <label for="cartEventOnly">이벤트만 사용</label>
+                </div>
+            </div>
+
+            <!-- 조건 1: 상품고유값만 -->
+            <div id="cartCondition1" class="condition-group" style="display: none;">
+                <div class="condition-title">상품고유값 정보</div>
+                <div class="form-group">
+                    <label for="cartProductId">상품 ID</label>
+                    <input type="text" id="cartProductId" placeholder="상품 고유 ID를 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="cartProductName">상품명</label>
+                    <input type="text" id="cartProductName" placeholder="상품명을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="cartProductQuantity">수량</label>
+                    <input type="number" id="cartProductQuantity" placeholder="수량을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="cartProductPrice">가격</label>
+                    <input type="number" id="cartProductPrice" placeholder="가격을 입력하세요">
+                </div>
+            </div>
+
+            <!-- 조건 2: 상품고유값 + 태그 -->
+            <div id="cartCondition2" class="condition-group" style="display: none;">
+                <div class="condition-title">상품고유값 + 태그 정보</div>
+                <div class="form-group">
+                    <label for="cartProductId2">상품 ID</label>
+                    <input type="text" id="cartProductId2" placeholder="상품 고유 ID를 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="cartProductName2">상품명</label>
+                    <input type="text" id="cartProductName2" placeholder="상품명을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="cartProductQuantity2">수량</label>
+                    <input type="number" id="cartProductQuantity2" placeholder="수량을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="cartProductPrice2">가격</label>
+                    <input type="number" id="cartProductPrice2" placeholder="가격을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="cartTagValue">태그 값</label>
+                    <input type="text" id="cartTagValue" placeholder="태그 값을 입력하세요">
+                </div>
+            </div>
+
+            <button onclick="triggerAddToCart()">장바구니 추가 이벤트 실행</button>
+        </div>
+
+        <!-- 구매 이벤트 -->
+        <div class="section">
+            <h2>구매 이벤트</h2>
+            <div class="form-group">
+                <label for="purchaseTotalQuantity">총 수량</label>
+                <input type="number" id="purchaseTotalQuantity" placeholder="총 수량을 입력하세요">
+            </div>
+            <div class="form-group">
+                <label for="purchaseTotalPrice">총 가격</label>
+                <input type="number" id="purchaseTotalPrice" placeholder="총 가격을 입력하세요">
+            </div>
+            <div class="form-group">
+                <label for="purchaseCurrency">통화</label>
+                <select id="purchaseCurrency">
+                    <option value="KRW">KRW</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="JPY">JPY</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="purchaseProduct">
+                    <label for="purchaseProduct">상품 정보 추가</label>
+                </div>
+                <div id="purchaseProductOptional" class="optional-fields">
+                    <div class="form-group">
+                        <label for="purchaseProductId">상품 ID</label>
+                        <input type="text" id="purchaseProductId" placeholder="상품 고유 ID를 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="purchaseProductName">상품명</label>
+                        <input type="text" id="purchaseProductName" placeholder="상품명을 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="purchaseProductQuantity">수량</label>
+                        <input type="number" id="purchaseProductQuantity" placeholder="수량을 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="purchaseProductPrice">가격</label>
+                        <input type="number" id="purchaseProductPrice" placeholder="가격을 입력하세요">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="purchaseTag">
+                    <label for="purchaseTag">태그 추가</label>
+                </div>
+                <div id="purchaseTagOptional" class="optional-fields">
+                    <div class="form-group">
+                        <label for="purchaseTagValue">태그 값</label>
+                        <input type="text" id="purchaseTagValue" placeholder="태그 값을 입력하세요">
+                    </div>
+                </div>
+            </div>
+            <button onclick="triggerPurchase()">구매 이벤트 실행</button>
+        </div>
+    </div>
+
+    <script src="js/kakao-pixel-test.js"></script>
+</body>
+</html>

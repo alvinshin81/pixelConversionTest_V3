@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카카오 픽셀 이벤트 테스트</title>
+    <link rel="icon" type="image/png" href="rsc/qaThumb.png">
+    <script type="text/javascript" src="//t1.daumcdn.net/kas/static/kp.dev.min.js" async></script>
+    <link rel="stylesheet" href="css/basic.css">
+</head>
+<body>
+    <!-- 상단 고정 헤더 -->
+    <div class="fixed-header">
+        <div class="header-content">
+            <h1>
+                카카오 픽셀 이벤트 테스트
+                <img src="rsc/alvin.png" alt="Profile" class="header-profile">
+            </h1>
+            <!-- 결과 표시 -->
+            <div id="result" class="result">
+                <h3>실행 결과</h3>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 기본 설정 -->
+        <div class="section">
+            <h2>기본 설정</h2>
+            <div class="form-group">
+                <label for="trackId">Track ID <span class="required">*</span></label>
+                <input type="number" id="trackId" name="trackId" placeholder="트랙 ID를 입력하세요.(필수)" required>
+            </div>
+        </div>
+
+        <!-- 추가 설정 -->
+        <div class="section">
+            <h2>추가 설정</h2>
+            
+            <!-- 이벤트 선택 -->
+            <div class="form-group">
+                <label for="eventType">이벤트 타입 <span class="required">*</span></label>
+                <select id="eventType" required>
+                    <option value="">이벤트를 선택하세요</option>
+                    <option value="pageView">방문</option>
+                    <option value="completeRegistration">회원가입</option>
+                    <option value="search">검색</option>
+                    <option value="viewContent">컨텐츠 조회</option>
+                    <option value="addToWishList">위시리스트 추가</option>
+                    <option value="addToCart">장바구니 추가</option>
+                    <option value="viewCart">장바구니 조회</option>
+                    <option value="purchase">구매</option>
+                </select>
+            </div>
+
+            <!-- 태그 -->
+            <div class="form-group">
+                <label for="tagValue">태그 <span class="optional-text">(선택사항)</span></label>
+                <input type="text" id="tagValue" placeholder="태그 값을 입력하세요">
+            </div>
+
+            <!-- 키워드 -->
+            <div class="form-group">
+                <label for="keywordValue">키워드 <span class="optional-text">(선택사항)</span></label>
+                <input type="text" id="keywordValue" placeholder="검색 키워드를 입력하세요">
+            </div>
+
+            <!-- 상품 정보 -->
+            <div class="form-group">
+                <label for="productId">상품 ID <span class="optional-text">(선택사항)</span></label>
+                <input type="text" id="productId" placeholder="상품 고유 ID를 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label for="productName">상품명 <span class="optional-text">(선택사항)</span></label>
+                <input type="text" id="productName" placeholder="상품명을 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label for="productQuantity">상품 수량 <span class="optional-text">(선택사항)</span></label>
+                <input type="number" id="productQuantity" placeholder="상품 수량을 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label for="productPrice">상품 가격 <span class="optional-text">(선택사항)</span></label>
+                <input type="number" id="productPrice" placeholder="상품 가격을 입력하세요">
+            </div>
+
+            <!-- 구매 정보 (구매 이벤트용) -->
+            <div class="form-group">
+                <label for="totalQuantity">총 수량 <span class="optional-text">(선택사항)</span></label>
+                <input type="number" id="totalQuantity" placeholder="총 수량을 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label for="totalPrice">총 가격 <span class="optional-text">(선택사항)</span></label>
+                <input type="number" id="totalPrice" placeholder="총 가격을 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label for="currency">통화 <span class="optional-text">(선택사항)</span></label>
+                <select id="currency">
+                    <option value="">통화를 선택하세요</option>
+                    <option value="KRW">KRW</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="JPY">JPY</option>
+                </select>
+            </div>
+
+            <!-- 실행 버튼 -->
+            <div class="form-group">
+                <button onclick="executeEvent()" id="executeBtn" disabled>이벤트 실행</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/kakao-pixel-test.js"></script>
+</body>
+</html>
