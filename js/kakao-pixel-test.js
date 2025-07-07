@@ -5,19 +5,33 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeEventHandlers();
 });
 
-// 이벤트 핸들러 초기화
-function initializeEventHandlers() {
-    // 이벤트 타입 선택 시 버튼 활성화
-    const eventType = document.getElementById('eventType');
+// 버튼 활성화 상태 검사 함수
+function checkButtonActivation() {
+    const trackId = document.getElementById('trackId').value.trim();
+    const eventType = document.getElementById('eventType').value;
     const executeBtn = document.getElementById('executeBtn');
     
-    eventType.addEventListener('change', function() {
-        if (this.value) {
-            executeBtn.disabled = false;
-        } else {
-            executeBtn.disabled = true;
-        }
-    });
+    // Track ID와 이벤트 타입이 모두 입력/선택되었을 때만 버튼 활성화
+    if (trackId && eventType) {
+        executeBtn.disabled = false;
+    } else {
+        executeBtn.disabled = true;
+    }
+}
+
+// 이벤트 핸들러 초기화
+function initializeEventHandlers() {
+    const trackIdInput = document.getElementById('trackId');
+    const eventTypeSelect = document.getElementById('eventType');
+    
+    // Track ID 입력 시 버튼 상태 검사
+    trackIdInput.addEventListener('input', checkButtonActivation);
+    
+    // 이벤트 타입 선택 시 버튼 상태 검사
+    eventTypeSelect.addEventListener('change', checkButtonActivation);
+    
+    // 초기 상태 검사
+    checkButtonActivation();
 }
 
 // Track ID 유효성 검사
@@ -33,24 +47,38 @@ function validateTrackId() {
     return trackId.value;
 }
 
-// 결과 표시 함수
+// 토스트 팝업 표시 함수
 function showResult(message, isSuccess = true) {
-    const resultDiv = document.getElementById('result');
-    const resultContent = document.getElementById('resultContent');
+    const toast = document.getElementById('toast');
+    const toastContent = document.getElementById('toastContent');
     
-    resultContent.innerHTML = `
-        <p style="color: ${isSuccess ? 'green' : 'red'}; font-weight: bold;">
+    // 메시지와 타임스탬프 설정
+    toastContent.innerHTML = `
+        <div style="font-weight: bold; margin-bottom: 5px;">
             ${message}
-        </p>
-        <p><small>실행 시간: ${new Date().toLocaleString()}</small></p>
+        </div>
+        <div style="font-size: 12px; opacity: 0.8;">
+            실행 시간: ${new Date().toLocaleString()}
+        </div>
     `;
     
-    resultDiv.classList.add('show');
+    // 기존 클래스 제거
+    toast.classList.remove('success', 'error', 'show');
     
-    // 10초 후 결과 숨기기
+    // 성공/실패에 따른 스타일 적용
+    if (isSuccess) {
+        toast.classList.add('success');
+    } else {
+        toast.classList.add('error');
+    }
+    
+    // 토스트 표시
+    toast.classList.add('show');
+    
+    // 4초 후 토스트 숨기기
     setTimeout(() => {
-        resultDiv.classList.remove('show');
-    }, 10000);
+        toast.classList.remove('show');
+    }, 4000);
 }
 
 // 복수 입력값 파싱 함수
