@@ -194,8 +194,8 @@ function createPurchaseData(data) {
     
     // 총 수량/가격 계산
     const totals = calculateTotals(data);
-    if (totals.totalQuantity) purchaseData.total_quantity = totals.totalQuantity;
-    if (totals.totalPrice) purchaseData.total_price = totals.totalPrice;
+    if (totals.totalQuantity) purchaseData.total_quantity = totals.totalQuantity.toString();
+    if (totals.totalPrice) purchaseData.total_price = totals.totalPrice.toString();
     if (data.currency) purchaseData.currency = data.currency;
     
     // 복수 상품 정보 처리
