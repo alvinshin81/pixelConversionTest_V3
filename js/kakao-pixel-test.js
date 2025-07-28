@@ -87,12 +87,13 @@ function parseMultipleValues(value) {
     return value.split(',').map(item => item.trim()).filter(item => item !== '');
 }
 
-// 상품 필드 유효성 검증 함수
+// 상품 필드 유효성 검증 함수 (brand 필드 포함)
 function validateProductFields() {
     const productIdValue = document.getElementById('productId').value.trim();
     const productNameValue = document.getElementById('productName').value.trim();
     const productQuantityValue = document.getElementById('productQuantity').value.trim();
     const productPriceValue = document.getElementById('productPrice').value.trim();
+    const productBrandValue = document.getElementById('productBrand').value.trim();
     
     // 비어있는 필드는 검증하지 않음
     const fields = [];
@@ -100,6 +101,7 @@ function validateProductFields() {
     if (productNameValue) fields.push({ name: '상품명', values: parseMultipleValues(productNameValue) });
     if (productQuantityValue) fields.push({ name: '상품 수량', values: parseMultipleValues(productQuantityValue) });
     if (productPriceValue) fields.push({ name: '상품 가격', values: parseMultipleValues(productPriceValue) });
+    if (productBrandValue) fields.push({ name: '브랜드명', values: parseMultipleValues(productBrandValue) });
     
     if (fields.length === 0) return true; // 모든 필드가 비어있으면 유효
     
@@ -127,12 +129,49 @@ function collectInputData() {
         productName: document.getElementById('productName').value.trim(),
         productQuantity: document.getElementById('productQuantity').value.trim(),
         productPrice: document.getElementById('productPrice').value.trim(),
+        productBrand: document.getElementById('productBrand').value.trim(),
         currency: document.getElementById('currency').value
     };
 }
 
-// 상품 데이터 객체 생성 (복수 상품 지원)
-function createProductData(data) {
+// 신규 상품 데이터 객체 생성 (2025.07.18 업데이트 반영)
+function createNewProductData(data) {
+    const productIds = parseMultipleValues(data.productId);
+    const productNames = parseMultipleValues(data.productName);
+    const productQuantities = parseMultipleValues(data.productQuantity);
+    const productPrices = parseMultipleValues(data.productPrice);
+    const productBrands = parseMultipleValues(data.productBrand);
+    
+    if (productIds.length === 0) return null;
+    
+    const products = [];
+    for (let i = 0; i < productIds.length; i++) {
+        const product = {};
+        if (productIds[i]) product.id = productIds[i];
+        if (productNames[i]) product.name = productNames[i];
+        if (productQuantities[i]) product.quantity = productQuantities[i];
+        if (productPrices[i]) product.price = productPrices[i];
+        if (productBrands[i]) product.brand = productBrands[i];
+        
+        if (Object.keys(product).length > 0) {
+            products.push(product);
+        }
+    }
+    
+    if (products.length === 0) return null;
+    
+    const eventData = {
+        currency: data.currency || "KRW",
+        products: products
+    };
+    
+    if (data.tag) eventData.tag = data.tag;
+    
+    return eventData;
+}
+
+// 기존 상품 데이터 객체 생성 (호환성 유지, 2026.01.31까지 지원)
+function createLegacyProductData(data) {
     const productIds = parseMultipleValues(data.productId);
     const productNames = parseMultipleValues(data.productName);
     const productQuantities = parseMultipleValues(data.productQuantity);
@@ -162,6 +201,20 @@ function createProductData(data) {
     return Object.keys(productData).length > 0 ? productData : null;
 }
 
+// 상품 데이터 객체 생성 (주요 인터페이스)
+function createProductData(data) {
+    // 2026.01.31 이후에는 신규 형식만 사용
+    const currentDate = new Date();
+    const deprecationDate = new Date('2026-02-01');
+    
+    if (currentDate >= deprecationDate) {
+        return createNewProductData(data);
+    } else {
+        // 현재는 신규 형식 우선 사용
+        return createNewProductData(data);
+    }
+}
+
 // 총 수량/가격 계산 함수
 function calculateTotals(data) {
     const productQuantities = parseMultipleValues(data.productQuantity);
@@ -188,7 +241,7 @@ function calculateTotals(data) {
     };
 }
 
-// 구매 데이터 객체 생성 (복수 상품 지원)
+// 구매 데이터 객체 생성 (2025.07.18 업데이트 반영, brand 매개변수 포함)
 function createPurchaseData(data) {
     let purchaseData = {};
     
@@ -198,11 +251,12 @@ function createPurchaseData(data) {
     if (totals.totalPrice) purchaseData.total_price = totals.totalPrice.toString();
     if (data.currency) purchaseData.currency = data.currency;
     
-    // 복수 상품 정보 처리
+    // 복수 상품 정보 처리 (brand 포함)
     const productIds = parseMultipleValues(data.productId);
     const productNames = parseMultipleValues(data.productName);
     const productQuantities = parseMultipleValues(data.productQuantity);
     const productPrices = parseMultipleValues(data.productPrice);
+    const productBrands = parseMultipleValues(data.productBrand);
     
     if (productIds.length > 0) {
         const products = [];
@@ -213,6 +267,7 @@ function createPurchaseData(data) {
             if (productNames[i]) product.name = productNames[i];
             if (productQuantities[i]) product.quantity = productQuantities[i];
             if (productPrices[i]) product.price = productPrices[i];
+            if (productBrands[i]) product.brand = productBrands[i]; // 신규 brand 매개변수 추가
             
             if (Object.keys(product).length > 0) {
                 products.push(product);
@@ -313,6 +368,9 @@ function executePageView(data, logData) {
 
 // 회원가입 이벤트
 function executeCompleteRegistration(data, logData) {
+    // pageView 이벤트 먼저 실행
+    kakaoPixel(data.trackId).pageView();
+    
     if (data.tag) {
         logData.tag = data.tag;
         console.log('👤 [카카오 픽셀 이벤트] 회원가입 (태그 포함)', logData);
@@ -327,6 +385,9 @@ function executeCompleteRegistration(data, logData) {
 
 // 검색 이벤트
 function executeSearch(data, logData) {
+    // pageView 이벤트 먼저 실행
+    kakaoPixel(data.trackId).pageView();
+    
     const searchData = createSearchData(data);
     
     if (searchData) {
@@ -341,15 +402,18 @@ function executeSearch(data, logData) {
     }
 }
 
-// 컨텐츠 조회 이벤트
+// 컨텐츠 조회 이벤트 (2025.07.18 업데이트 반영)
 function executeViewContent(data, logData) {
+    // pageView 이벤트 먼저 실행
+    kakaoPixel(data.trackId).pageView();
+    
     const productData = createProductData(data);
     
     if (productData) {
         logData.data = productData;
-        console.log('👁️ [카카오 픽셀 이벤트] 컨텐츠 조회 (상품정보)', logData);
+        console.log('👁️ [카카오 픽셀 이벤트] 컨텐츠 조회 (신규 형식)', logData);
         kakaoPixel(data.trackId).viewContent(productData);
-        showResult(`컨텐츠 조회 이벤트가 상품 정보와 함께 실행되었습니다: ${JSON.stringify(productData)}`);
+        showResult(`컨텐츠 조회 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
     } else {
         console.log('👁️ [카카오 픽셀 이벤트] 컨텐츠 조회', logData);
         kakaoPixel(data.trackId).viewContent();
@@ -357,15 +421,18 @@ function executeViewContent(data, logData) {
     }
 }
 
-// 위시리스트 추가 이벤트
+// 위시리스트 추가 이벤트 (2025.07.18 업데이트 반영)
 function executeAddToWishList(data, logData) {
+    // pageView 이벤트 먼저 실행
+    kakaoPixel(data.trackId).pageView();
+    
     const productData = createProductData(data);
     
     if (productData) {
         logData.data = productData;
-        console.log('❤️ [카카오 픽셀 이벤트] 위시리스트 추가 (상품정보)', logData);
+        console.log('❤️ [카카오 픽셀 이벤트] 위시리스트 추가 (신규 형식)', logData);
         kakaoPixel(data.trackId).addToWishList(productData);
-        showResult(`위시리스트 추가 이벤트가 상품 정보와 함께 실행되었습니다: ${JSON.stringify(productData)}`);
+        showResult(`위시리스트 추가 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
     } else {
         console.log('❤️ [카카오 픽셀 이벤트] 위시리스트 추가', logData);
         kakaoPixel(data.trackId).addToWishList();
@@ -373,15 +440,18 @@ function executeAddToWishList(data, logData) {
     }
 }
 
-// 장바구니 추가 이벤트
+// 장바구니 추가 이벤트 (2025.07.18 업데이트 반영)
 function executeAddToCart(data, logData) {
+    // pageView 이벤트 먼저 실행
+    kakaoPixel(data.trackId).pageView();
+    
     const productData = createProductData(data);
     
     if (productData) {
         logData.data = productData;
-        console.log('🛒 [카카오 픽셀 이벤트] 장바구니 추가 (상품정보)', logData);
+        console.log('🛒 [카카오 픽셀 이벤트] 장바구니 추가 (신규 형식)', logData);
         kakaoPixel(data.trackId).addToCart(productData);
-        showResult(`장바구니 추가 이벤트가 상품 정보와 함께 실행되었습니다: ${JSON.stringify(productData)}`);
+        showResult(`장바구니 추가 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
     } else {
         console.log('🛒 [카카오 픽셀 이벤트] 장바구니 추가', logData);
         kakaoPixel(data.trackId).addToCart();
@@ -391,6 +461,9 @@ function executeAddToCart(data, logData) {
 
 // 장바구니 조회 이벤트
 function executeViewCart(data, logData) {
+    // pageView 이벤트 먼저 실행
+    kakaoPixel(data.trackId).pageView();
+    
     if (data.tag) {
         logData.tag = data.tag;
         console.log('🛒 [카카오 픽셀 이벤트] 장바구니 조회 (태그 포함)', logData);
@@ -403,15 +476,18 @@ function executeViewCart(data, logData) {
     }
 }
 
-// 구매 이벤트
+// 구매 이벤트 (2025.07.18 업데이트 반영, brand 매개변수 포함)
 function executePurchase(data, logData) {
+    // pageView 이벤트 먼저 실행
+    kakaoPixel(data.trackId).pageView();
+    
     const purchaseData = createPurchaseData(data);
     
     if (purchaseData) {
         logData.data = purchaseData;
-        console.log('💳 [카카오 픽셀 이벤트] 구매 (데이터 포함)', logData);
+        console.log('💳 [카카오 픽셀 이벤트] 구매 (신규 형식, brand 포함)', logData);
         kakaoPixel(data.trackId).purchase(purchaseData);
-        showResult(`구매 이벤트가 데이터와 함께 실행되었습니다: ${JSON.stringify(purchaseData)}`);
+        showResult(`구매 이벤트가 신규 형식으로 실행되었습니다 (brand 포함): ${JSON.stringify(purchaseData)}`);
     } else {
         if (data.tag) {
             logData.tag = data.tag;
