@@ -1,13 +1,6 @@
 //track ID 목록
 // const trackIdList = ['7152515445403531586', '6141657146100435130', '4917123126974236283', '4587589955779840066'];
 
-const trackIdDbList = [
-    { ID: '4587589955779840066', NAME: '기획테스트 이것저것' },
-    { ID: '4917123126974236283', NAME: '이벤트 커스텀 테스트 픽셀' },
-    { ID: '6141657146100435130', NAME: '부메랑M2 Catalog 0' },
-    { ID: '7152515445403531586', NAME: '알림톡 테스트' }
-  ]
-
 const trackIdDbList_cbt = [
     { ID: '1621177623377261241', NAME: '이벤트 수집용 앨빈꺼' },
     { ID: '5610088114123656460', NAME: '앨빈QA' }
@@ -40,7 +33,7 @@ function createTrackIdTable() {
     // 테이블 바디 생성
     const tbody = document.createElement('tbody');
     
-    trackIdDbList.forEach(item => {
+    trackIdDbList_cbt.forEach(item => {
         const row = document.createElement('tr');
         
         const idCell = document.createElement('td');
@@ -62,4 +55,3 @@ function createTrackIdTable() {
 document.addEventListener('DOMContentLoaded', function() {
     createTrackIdTable();
 });
-

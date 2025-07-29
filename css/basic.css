@@ -295,3 +295,67 @@ button:disabled:hover {
     z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
+
+/* CBT 버튼 컨테이너 */
+.cbt-button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+/* Phase 안내 텍스트 */
+.phase-info {
+    font-size: 14px;
+    color: #495057;
+}
+
+.phase-highlight {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* CBT 버튼 스타일 */
+.cbt-button {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+}
+
+.cbt-button:hover {
+    background: linear-gradient(135deg, #218838 0%, #1c7d6b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+/* CBT 타이틀 스타일 */
+.cbt-title {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+}
+
+/* Sandbox 버튼 스타일 */
+.sandbox-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.sandbox-button:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b5b95 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}

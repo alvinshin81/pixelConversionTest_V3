@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>카카오 픽셀 이벤트 테스트</title>
+    <title>카카오 픽셀 이벤트 테스트_CBT</title>
     <link rel="icon" type="image/png" href="rsc/qaThumb.png">
-    <script type="text/javascript" src="//t1.daumcdn.net/kas/static/kp.dev.min.js" async></script>
+    <script type="text/javascript" charset="UTF-8" src="//t1.daumcdn.net/kas/static/kp.js"></script>
     <link rel="stylesheet" href="css/basic.css">
 </head>
 <body>
@@ -15,18 +15,18 @@
     <!-- 상단 고정 헤더 -->
     <div class="fixed-header">
         <div class="header-content">
-            <h1>
-                카카오 픽셀 이벤트 테스트
+            <h1 class="cbt-title">
+                카카오 픽셀 이벤트 테스트_CBT
                 <img src="rsc/alvin.png" alt="Profile" class="header-profile">
             </h1>
         </div>
     </div>
 
     <div class="container">
-        <!-- CBT 버튼 -->
+        <!-- Sandbox 버튼 -->
         <div class="cbt-button-container">
-            <div class="phase-info">현재 선택된 Phase는 <span class="phase-highlight">Sandbox</span> 입니다.</div>
-            <button id="cbtBtn" class="cbt-button">CBT에서 발생시키기</button>
+            <div class="phase-info">현재 선택된 Phase는 <span class="phase-highlight">CBT</span> 입니다.</div>
+            <button id="sandboxBtn" class="sandbox-button">Sandbox에서 발생시키기</button>
         </div>
         
         <!-- 기본 설정 -->
@@ -135,7 +135,7 @@
     <div id="toast" class="toast">
         <div id="toastContent"></div>
     </div>
-    <script src="js/trackIds.js"></script>
-    <script src="js/kakao-pixel-test.js"></script>
+    <script src="js/trackIds_cbt.js"></script>
+    <script src="js/kakao-pixel-test_cbt.js"></script>
 </body>
 </html>

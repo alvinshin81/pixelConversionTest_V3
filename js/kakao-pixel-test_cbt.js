@@ -1,9 +1,9 @@
-// 카카오 픽셀 이벤트 테스트 JavaScript (새로운 UI)
+// 카카오 픽셀 이벤트 테스트 JavaScript (CBT 버전)
 
 // DOM 로드 완료 후 실행
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventHandlers();
-    initializeCbtButton();
+    initializeSandboxButton();
 });
 
 // 버튼 활성화 상태 검사 함수
@@ -316,7 +316,8 @@ function executeEvent() {
         const logData = {
             event: data.eventType,
             trackId: data.trackId,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            environment: 'CBT'
         };
         
         switch (data.eventType) {
@@ -348,7 +349,7 @@ function executeEvent() {
                 showResult('지원하지 않는 이벤트 타입입니다.', false);
         }
     } catch (error) {
-        console.error('❌ [카카오 픽셀 이벤트] 실행 오류:', error);
+        console.error('❌ [카카오 픽셀 이벤트 CBT] 실행 오류:', error);
         showResult(`이벤트 실행 중 오류가 발생했습니다: ${error.message}`, false);
     }
 }
@@ -357,13 +358,13 @@ function executeEvent() {
 function executePageView(data, logData) {
     if (data.tag) {
         logData.tag = data.tag;
-        console.log('🔍 [카카오 픽셀 이벤트] 방문 (태그 포함)', logData);
+        console.log('🔍 [카카오 픽셀 이벤트 CBT] 방문 (태그 포함)', logData);
         kakaoPixel(data.trackId).pageView(data.tag);
-        showResult(`방문 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
+        showResult(`[CBT] 방문 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
     } else {
-        console.log('🔍 [카카오 픽셀 이벤트] 방문', logData);
+        console.log('🔍 [카카오 픽셀 이벤트 CBT] 방문', logData);
         kakaoPixel(data.trackId).pageView();
-        showResult('방문 이벤트가 실행되었습니다.');
+        showResult('[CBT] 방문 이벤트가 실행되었습니다.');
     }
 }
 
@@ -374,13 +375,13 @@ function executeCompleteRegistration(data, logData) {
     
     if (data.tag) {
         logData.tag = data.tag;
-        console.log('👤 [카카오 픽셀 이벤트] 회원가입 (태그 포함)', logData);
+        console.log('👤 [카카오 픽셀 이벤트 CBT] 회원가입 (태그 포함)', logData);
         kakaoPixel(data.trackId).completeRegistration(data.tag);
-        showResult(`회원가입 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
+        showResult(`[CBT] 회원가입 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
     } else {
-        console.log('👤 [카카오 픽셀 이벤트] 회원가입', logData);
+        console.log('👤 [카카오 픽셀 이벤트 CBT] 회원가입', logData);
         kakaoPixel(data.trackId).completeRegistration();
-        showResult('회원가입 이벤트가 실행되었습니다.');
+        showResult('[CBT] 회원가입 이벤트가 실행되었습니다.');
     }
 }
 
@@ -393,13 +394,13 @@ function executeSearch(data, logData) {
     
     if (searchData) {
         logData.data = searchData;
-        console.log('🔍 [카카오 픽셀 이벤트] 검색 (데이터 포함)', logData);
+        console.log('🔍 [카카오 픽셀 이벤트 CBT] 검색 (데이터 포함)', logData);
         kakaoPixel(data.trackId).search(searchData);
-        showResult(`검색 이벤트가 데이터와 함께 실행되었습니다: ${JSON.stringify(searchData)}`);
+        showResult(`[CBT] 검색 이벤트가 데이터와 함께 실행되었습니다: ${JSON.stringify(searchData)}`);
     } else {
-        console.log('🔍 [카카오 픽셀 이벤트] 검색', logData);
+        console.log('🔍 [카카오 픽셀 이벤트 CBT] 검색', logData);
         kakaoPixel(data.trackId).search();
-        showResult('검색 이벤트가 실행되었습니다.');
+        showResult('[CBT] 검색 이벤트가 실행되었습니다.');
     }
 }
 
@@ -412,13 +413,13 @@ function executeViewContent(data, logData) {
     
     if (productData) {
         logData.data = productData;
-        console.log('👁️ [카카오 픽셀 이벤트] 컨텐츠 조회 (신규 형식)', logData);
+        console.log('👁️ [카카오 픽셀 이벤트 CBT] 컨텐츠 조회 (신규 형식)', logData);
         kakaoPixel(data.trackId).viewContent(productData);
-        showResult(`컨텐츠 조회 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
+        showResult(`[CBT] 컨텐츠 조회 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
     } else {
-        console.log('👁️ [카카오 픽셀 이벤트] 컨텐츠 조회', logData);
+        console.log('👁️ [카카오 픽셀 이벤트 CBT] 컨텐츠 조회', logData);
         kakaoPixel(data.trackId).viewContent();
-        showResult('컨텐츠 조회 이벤트가 실행되었습니다.');
+        showResult('[CBT] 컨텐츠 조회 이벤트가 실행되었습니다.');
     }
 }
 
@@ -431,13 +432,13 @@ function executeAddToWishList(data, logData) {
     
     if (productData) {
         logData.data = productData;
-        console.log('❤️ [카카오 픽셀 이벤트] 위시리스트 추가 (신규 형식)', logData);
+        console.log('❤️ [카카오 픽셀 이벤트 CBT] 위시리스트 추가 (신규 형식)', logData);
         kakaoPixel(data.trackId).addToWishList(productData);
-        showResult(`위시리스트 추가 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
+        showResult(`[CBT] 위시리스트 추가 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
     } else {
-        console.log('❤️ [카카오 픽셀 이벤트] 위시리스트 추가', logData);
+        console.log('❤️ [카카오 픽셀 이벤트 CBT] 위시리스트 추가', logData);
         kakaoPixel(data.trackId).addToWishList();
-        showResult('위시리스트 추가 이벤트가 실행되었습니다.');
+        showResult('[CBT] 위시리스트 추가 이벤트가 실행되었습니다.');
     }
 }
 
@@ -450,13 +451,13 @@ function executeAddToCart(data, logData) {
     
     if (productData) {
         logData.data = productData;
-        console.log('🛒 [카카오 픽셀 이벤트] 장바구니 추가 (신규 형식)', logData);
+        console.log('🛒 [카카오 픽셀 이벤트 CBT] 장바구니 추가 (신규 형식)', logData);
         kakaoPixel(data.trackId).addToCart(productData);
-        showResult(`장바구니 추가 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
+        showResult(`[CBT] 장바구니 추가 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
     } else {
-        console.log('🛒 [카카오 픽셀 이벤트] 장바구니 추가', logData);
+        console.log('🛒 [카카오 픽셀 이벤트 CBT] 장바구니 추가', logData);
         kakaoPixel(data.trackId).addToCart();
-        showResult('장바구니 추가 이벤트가 실행되었습니다.');
+        showResult('[CBT] 장바구니 추가 이벤트가 실행되었습니다.');
     }
 }
 
@@ -467,13 +468,13 @@ function executeViewCart(data, logData) {
     
     if (data.tag) {
         logData.tag = data.tag;
-        console.log('🛒 [카카오 픽셀 이벤트] 장바구니 조회 (태그 포함)', logData);
+        console.log('🛒 [카카오 픽셀 이벤트 CBT] 장바구니 조회 (태그 포함)', logData);
         kakaoPixel(data.trackId).viewCart(data.tag);
-        showResult(`장바구니 조회 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
+        showResult(`[CBT] 장바구니 조회 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
     } else {
-        console.log('🛒 [카카오 픽셀 이벤트] 장바구니 조회', logData);
+        console.log('🛒 [카카오 픽셀 이벤트 CBT] 장바구니 조회', logData);
         kakaoPixel(data.trackId).viewCart();
-        showResult('장바구니 조회 이벤트가 실행되었습니다.');
+        showResult('[CBT] 장바구니 조회 이벤트가 실행되었습니다.');
     }
 }
 
@@ -486,19 +487,19 @@ function executePurchase(data, logData) {
     
     if (purchaseData) {
         logData.data = purchaseData;
-        console.log('💳 [카카오 픽셀 이벤트] 구매 (신규 형식, brand 포함)', logData);
+        console.log('💳 [카카오 픽셀 이벤트 CBT] 구매 (신규 형식, brand 포함)', logData);
         kakaoPixel(data.trackId).purchase(purchaseData);
-        showResult(`구매 이벤트가 신규 형식으로 실행되었습니다 (brand 포함): ${JSON.stringify(purchaseData)}`);
+        showResult(`[CBT] 구매 이벤트가 신규 형식으로 실행되었습니다 (brand 포함): ${JSON.stringify(purchaseData)}`);
     } else {
         if (data.tag) {
             logData.tag = data.tag;
-            console.log('💳 [카카오 픽셀 이벤트] 구매 (태그)', logData);
+            console.log('💳 [카카오 픽셀 이벤트 CBT] 구매 (태그)', logData);
             kakaoPixel(data.trackId).purchase(data.tag);
-            showResult(`구매 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
+            showResult(`[CBT] 구매 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
         } else {
-            console.log('💳 [카카오 픽셀 이벤트] 구매', logData);
+            console.log('💳 [카카오 픽셀 이벤트 CBT] 구매', logData);
             kakaoPixel(data.trackId).purchase();
-            showResult('구매 이벤트가 실행되었습니다.');
+            showResult('[CBT] 구매 이벤트가 실행되었습니다.');
         }
     }
 }
@@ -506,18 +507,18 @@ function executePurchase(data, logData) {
 // 카카오 픽셀 스크립트 로드 확인
 function checkKakaoPixelLoaded() {
     if (typeof kakaoPixel === 'undefined') {
-        showResult('카카오 픽셀 스크립트가 로드되지 않았습니다. 페이지를 새로고침해주세요.', false);
+        showResult('[CBT] 카카오 픽셀 스크립트가 로드되지 않았습니다. 페이지를 새로고침해주세요.', false);
         return false;
     }
     return true;
 }
 
-// CBT 버튼 초기화
-function initializeCbtButton() {
-    const cbtBtn = document.getElementById('cbtBtn');
-    if (cbtBtn) {
-        cbtBtn.addEventListener('click', function() {
-            window.location.href = 'cbt_event.html';
+// Sandbox 버튼 초기화
+function initializeSandboxButton() {
+    const sandboxBtn = document.getElementById('sandboxBtn');
+    if (sandboxBtn) {
+        sandboxBtn.addEventListener('click', function() {
+            window.location.href = 'index.html';
         });
     }
 }
@@ -526,7 +527,7 @@ function initializeCbtButton() {
 window.addEventListener('load', function() {
     setTimeout(() => {
         if (!checkKakaoPixelLoaded()) {
-            console.warn('Kakao Pixel script not loaded properly');
+            console.warn('Kakao Pixel script not loaded properly (CBT)');
         }
     }, 2000);
 });
