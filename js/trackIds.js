@@ -9,12 +9,6 @@ const trackIdDbList = [
     { ID: '5550555478470577521', NAME: '엘리꺼'}
   ]
 
-const trackIdDbList_cbt = [
-    { ID: '1621177623377261241', NAME: '이벤트 수집용 앨빈꺼' },
-    { ID: '5610088114123656460', NAME: '앨빈QA' }
-    { ID: '4193549944368709004', NAME: '엘리꺼'}
-  ]
-
 // Track ID 참고 테이블 생성 함수
 function createTrackIdTable() {
     const trackIdsContainer = document.getElementById('trackIds');
