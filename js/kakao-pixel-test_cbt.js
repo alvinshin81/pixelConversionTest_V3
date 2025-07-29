@@ -295,6 +295,12 @@ function createSearchData(data) {
     return Object.keys(searchData).length > 0 ? searchData : null;
 }
 
+// 모바일 디바이스 감지 함수
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+           (window.innerWidth <= 768);
+}
+
 // 새 창에서 이벤트 실행하는 함수 (CBT용)
 function executeEventInNewWindow(eventType, trackId, eventData, isProduction = true) {
     // Phase별 스크립트 URL 결정
@@ -302,8 +308,22 @@ function executeEventInNewWindow(eventType, trackId, eventData, isProduction = t
         '//t1.daumcdn.net/kas/static/kp.js' : 
         '//t1.daumcdn.net/kas/static/kp.dev.min.js';
     
-    // 새 창 열기
+    // 모바일에서는 팝업 차단 가능성이 높으므로 같은 창에서 실행
+    if (isMobile()) {
+        executeEventInSamePage(eventType, trackId, eventData, isProduction);
+        return;
+    }
+    
+    // 새 창 열기 (데스크톱)
     const newWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
+    
+    // 팝업이 차단된 경우 처리
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        console.warn('팝업이 차단되어 같은 창에서 이벤트를 실행합니다.');
+        showResult('팝업이 차단되어 같은 창에서 이벤트를 실행합니다.', false);
+        executeEventInSamePage(eventType, trackId, eventData, isProduction);
+        return;
+    }
     
     // 이벤트별 실행 스크립트 생성
     let executeScript = '';
@@ -467,6 +487,100 @@ function executeEventInNewWindow(eventType, trackId, eventData, isProduction = t
     newWindow.document.close();
     
     console.log(`🚀 [CBT 새 창 실행] ${eventType} 이벤트를 새 창에서 실행합니다.`);
+}
+
+// 같은 페이지에서 이벤트 실행하는 함수 (CBT용 - 모바일/팝업 차단 대응)
+function executeEventInSamePage(eventType, trackId, eventData, isProduction = true) {
+    console.log(`📱 [CBT 같은 창 실행] ${eventType} 이벤트를 같은 창에서 실행합니다.`);
+    
+    // 토스트 메시지로 실행 상태 표시
+    showResult(`[CBT-${isMobile() ? '모바일' : '팝업차단'}] ${eventType} 이벤트를 같은 창에서 실행합니다.`, true);
+    
+    try {
+        // 이벤트별 실행 로직
+        switch(eventType) {
+            case 'pageView':
+                if (eventData && eventData.tag) {
+                    kakaoPixel(trackId).pageView(eventData.tag);
+                } else {
+                    kakaoPixel(trackId).pageView();
+                }
+                break;
+                
+            case 'completeRegistration':
+                kakaoPixel(trackId).pageView();
+                setTimeout(() => {
+                    if (eventData && eventData.tag) {
+                        kakaoPixel(trackId).completeRegistration(eventData.tag);
+                    } else {
+                        kakaoPixel(trackId).completeRegistration();
+                    }
+                }, 100);
+                break;
+                
+            case 'search':
+                kakaoPixel(trackId).pageView();
+                setTimeout(() => {
+                    if (eventData && Object.keys(eventData).length > 0) {
+                        kakaoPixel(trackId).search(eventData);
+                    } else {
+                        kakaoPixel(trackId).search();
+                    }
+                }, 100);
+                break;
+                
+            case 'viewContent':
+            case 'addToWishList':
+            case 'addToCart':
+                kakaoPixel(trackId).pageView();
+                setTimeout(() => {
+                    if (eventData && Object.keys(eventData).length > 0) {
+                        kakaoPixel(trackId)[eventType](eventData);
+                    } else {
+                        kakaoPixel(trackId)[eventType]();
+                    }
+                }, 100);
+                break;
+                
+            case 'viewCart':
+                kakaoPixel(trackId).pageView();
+                setTimeout(() => {
+                    if (eventData && eventData.tag) {
+                        kakaoPixel(trackId).viewCart(eventData.tag);
+                    } else {
+                        kakaoPixel(trackId).viewCart();
+                    }
+                }, 100);
+                break;
+                
+            case 'purchase':
+                kakaoPixel(trackId).pageView();
+                setTimeout(() => {
+                    if (eventData && Object.keys(eventData).length > 0) {
+                        kakaoPixel(trackId).purchase(eventData);
+                    } else if (eventData && eventData.tag) {
+                        kakaoPixel(trackId).purchase(eventData.tag);
+                    } else {
+                        kakaoPixel(trackId).purchase();
+                    }
+                }, 100);
+                break;
+                
+            default:
+                throw new Error(`지원하지 않는 이벤트 타입: ${eventType}`);
+        }
+        
+        console.log(`✅ [CBT 같은 창 실행] ${eventType} 이벤트가 성공적으로 실행되었습니다.`);
+        
+        // 3초 후 성공 메시지 표시
+        setTimeout(() => {
+            showResult(`✅ [CBT] ${eventType} 이벤트가 성공적으로 실행되었습니다!`, true);
+        }, 1000);
+        
+    } catch(error) {
+        console.error(`❌ [CBT 같은 창 실행] ${eventType} 실행 오류:`, error);
+        showResult(`❌ [CBT] 오류: ${error.message}`, false);
+    }
 }
 
 // 메인 이벤트 실행 함수
