@@ -10,7 +10,7 @@
 </head>
 <body>
     <!-- 버전 뱃지 -->
-    <div class="version-badge">V20250729.1436</div>
+    <div class="version-badge">V20250804.1500</div>
 
     <!-- 상단 고정 헤더 -->
     <div class="fixed-header">
@@ -23,10 +23,13 @@
     </div>
 
     <div class="container">
-        <!-- CBT 버튼 -->
+        <!-- 네비게이션 버튼 -->
         <div class="cbt-button-container">
             <div class="phase-info">현재 선택된 Phase는 <span class="phase-highlight">Sandbox</span> 입니다.</div>
-            <button id="cbtBtn" class="cbt-button">CBT에서 발생시키기</button>
+            <div style="display: flex; gap: 10px;">
+                <button id="cbtBtn" class="cbt-button">CBT에서 발생시키기</button>
+                <button id="fixedEventBtn" class="sandbox-button">Fixed Event 페이지</button>
+            </div>
         </div>
         
         <!-- 기본 설정 -->

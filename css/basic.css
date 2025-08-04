@@ -410,6 +410,11 @@ button:disabled:hover {
         gap: 8px;
     }
     
+    .cbt-button-container > div[style*="flex"] {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
     .cbt-button, .sandbox-button {
         width: 100%;
         text-align: center;

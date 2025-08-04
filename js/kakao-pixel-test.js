@@ -863,6 +863,14 @@ function initializeCbtButton() {
             window.location.href = 'cbt_event.html';
         });
     }
+    
+    // Fixed Event 버튼 초기화
+    const fixedEventBtn = document.getElementById('fixedEventBtn');
+    if (fixedEventBtn) {
+        fixedEventBtn.addEventListener('click', function() {
+            window.location.href = 'fixed_event.html';
+        });
+    }
 }
 
 // 페이지 로드 시 스크립트 확인
