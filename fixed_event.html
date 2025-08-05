@@ -17,7 +17,7 @@
                     currency: "KRW",     // 주문 가격의 화폐 단위(optional, 기본 값은 KRW)
                     products: [          // 주문 내 상품 정보(optional)
                         {id: "aaa1", name: "snack1", quantity: "1", price: "200", brand: "alvin"},
-                        {id: "bbb1",  name: "snack2", quantity: "1", price: "100", brand: "alvin"}
+                        {id: "bbb1", name: "snack2", quantity: "1", price: "100", brand: "alvin"}
                     ],
                     tag: 'fixed_trackId'
                 });
@@ -26,38 +26,38 @@
         };
     </script>
 </head>
-<body>
-    <!-- 버전 뱃지 -->
-    <div class="version-badge">V20250804.1500</div>
+<body><!-- 버전 뱃지 -->
+<div class="version-badge">V20250804.1500</div>
 
-    <!-- 상단 고정 헤더 -->
-    <div class="fixed-header">
-        <div class="header-content">
-            <h1>
-                카카오 픽셀 Fixed Event 테스트
-                <img src="rsc/alvin.png" alt="Profile" class="header-profile">
-            </h1>
+<!-- 상단 고정 헤더 -->
+<div class="fixed-header">
+    <div class="header-content">
+        <h1>
+            카카오 픽셀 Fixed Event 테스트
+            <img src="rsc/alvin.png" alt="Profile" class="header-profile"></h1>
         </div>
     </div>
 
     <div class="container">
         <!-- 네비게이션 버튼 -->
         <div class="cbt-button-container">
-            <div class="phase-info">현재 페이지: <span class="phase-highlight">Fixed Event</span></div>
+            <div class="phase-info">현재 페이지:
+                <span class="phase-highlight">Fixed Event</span>
+            </div>
             <div style="display: flex; gap: 10px;">
                 <button id="indexBtn" class="sandbox-button">메인 페이지로 돌아가기</button>
             </div>
         </div>
-        
+
         <!-- 고정 스크립트 안내 -->
         <div class="section">
             <h2>고정 실행 스크립트 (Sandbox)</h2>
             <div class="form-group">
                 <p class="description">이 페이지가 로드되면 아래 스크립트가 자동으로 실행됩니다:</p>
             </div>
-            
+
             <div class="form-group">
-                <pre style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid #dee2e6; font-size: 12.6px; line-height: 1.4; overflow-x: auto; transform: scale(0.9); transform-origin: left top; width: 111.11%;">
+                <pre style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid #dee2e6; font-size: 12.6px; line-height: 1.4; overflow-x: auto; transform: scale(0.9); transform-origin: left top; width: 100%;">
 <code>kakaoPixel('7152515445403531586').pageView();
 kakaoPixel('7152515445403531586').purchase({
     total_quantity: "2", // 주문 내 상품 개수(optional)
@@ -65,33 +65,36 @@ kakaoPixel('7152515445403531586').purchase({
     currency: "KRW",     // 주문 가격의 화폐 단위(optional, 기본 값은 KRW)
     products: [          // 주문 내 상품 정보(optional)
         {id: "aaa1", name: "snack1", quantity: "1", price: "200", brand: "alvin"},
-        {id: "bbb1",  name: "snack2", quantity: "1", price: "100", brand: "alvin"}
+        {id: "bbb1", name: "snack2", quantity: "1", price: "100", brand: "alvin"}
     ],
     tag: 'fixed_trackId'
 });</code>
                 </pre>
             </div>
-            
+
             <div class="form-group">
                 <p class="description">
-                    <strong>Track ID:</strong> 7152515445403531586 (알림톡 테스트)<br>
-                    <strong>실행 이벤트:</strong> pageView → purchase<br>
-                    <strong>상품 정보:</strong> 2개 상품, 총 가격 300원 (KRW)
-                </p>
+                    <strong>Track ID:</strong>
+                    7152515445403531586 (알림톡 테스트)<br>
+                        <strong>실행 이벤트:</strong>
+                        pageView → purchase<br>
+                            <strong>상품 정보:</strong>
+                            2개 상품, 총 가격 300원 (KRW)
+                        </p>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <script>
-        // 메인 페이지로 돌아가기 버튼
-        document.addEventListener('DOMContentLoaded', function() {
-            const indexBtn = document.getElementById('indexBtn');
-            if (indexBtn) {
-                indexBtn.addEventListener('click', function() {
-                    window.location.href = 'index.html';
+            <script>
+                // 메인 페이지로 돌아가기 버튼
+                document.addEventListener('DOMContentLoaded', function () {
+                    const indexBtn = document.getElementById('indexBtn');
+                    if (indexBtn) {
+                        indexBtn.addEventListener('click', function () {
+                            window.location.href = 'index.html';
+                        });
+                    }
                 });
-            }
-        });
-    </script>
-</body>
+            </script>
+        </body>
 </html>
