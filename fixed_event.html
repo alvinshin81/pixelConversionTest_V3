@@ -13,16 +13,32 @@
             setTimeout(() => {
                 kakaoPixel('7152515445403531586').pageView();
                 kakaoPixel('7152515445403531586').purchase({
-                    total_quantity: "2", // 주문 내 상품 개수(optional)
-                    total_price: "300",  // 주문 총 가격(optional)
-                    currency: "KRW",     // 주문 가격의 화폐 단위(optional, 기본 값은 KRW)
-                    products: [          // 주문 내 상품 정보(optional)
+                    total_quantity: "2",
+                    total_price: "300",
+                    currency: "KRW",
+                    products: [
                         {id: "aaa1", name: "snack1", quantity: "1", price: "200", brand: "alvin"},
                         {id: "bbb1", name: "snack2", quantity: "1", price: "100", brand: "alvin"}
                     ],
                     tag: 'fixed_trackId'
                 });
                 console.log('🔍 [Fixed Event] 고정 스크립트가 실행되었습니다.');
+            }, 1000);
+        };
+    </script>
+        <script type="text/javascript">
+        window.onload = function() {
+            setTimeout(() => {
+                kakaoPixel('7152515445403531586').pageView();
+                kakaoPixel('7152515445403531586').purchase({
+                    total_quantity: "2",
+                    total_price: "300",
+                    products: [
+                        {id: "aaa1", name: "snack3", quantity: "1", price: "200"},
+                        {id: "bbb1", name: "snack4", quantity: "1", price: "100"},
+                    ]
+                });
+                console.log('🔍 [Fixed Event] 고정 스크립트 2가 실행되었습니다.');
             }, 1000);
         };
     </script>
