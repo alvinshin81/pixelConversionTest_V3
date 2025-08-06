@@ -22,17 +22,6 @@ function insertVersionBadge() {
     console.log(`🏷️ [Version] 버전 뱃지 생성됨: ${CURRENT_VERSION}`);
 }
 
-// 자동 버전 생성 함수 (선택적 사용)
-function generateAutoVersion() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hour = String(now.getHours()).padStart(2, '0');
-    const minute = String(now.getMinutes()).padStart(2, '0');
-    return `V${year}${month}${day}.${hour}${minute}`;
-}
-
 // 페이지 로드 시 버전 뱃지 생성
 document.addEventListener('DOMContentLoaded', function() {
     insertVersionBadge();
