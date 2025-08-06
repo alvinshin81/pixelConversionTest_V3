@@ -3,7 +3,7 @@
 // 환경 설정 함수
 function getEnvironmentConfig() {
     const isCBT = window.location.pathname.includes('cbt_event') || 
-                  document.title.includes('CBT');
+                    document.title.includes('CBT');
     
     return {
         isCBT: isCBT,
