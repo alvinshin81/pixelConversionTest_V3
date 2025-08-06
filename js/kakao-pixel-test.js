@@ -1,9 +1,34 @@
-// 카카오 픽셀 이벤트 테스트 JavaScript (새로운 UI)
+// 카카오 픽셀 이벤트 테스트 JavaScript (통합 버전)
+
+// 환경 설정 함수
+function getEnvironmentConfig() {
+    const isCBT = window.location.pathname.includes('cbt_event') || 
+                  document.title.includes('CBT');
+    
+    return {
+        isCBT: isCBT,
+        isProduction: isCBT,
+        envPrefix: isCBT ? '[CBT] ' : '',
+        envText: isCBT ? ' (CBT)' : '',
+        theme: {
+            gradient: isCBT ? 
+                'linear-gradient(135deg, #28a745 0%, #20c997 100%)' : 
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            name: isCBT ? 'CBT (운영)' : 'Sandbox (개발)'
+        },
+        scriptUrl: isCBT ? 
+            '//t1.daumcdn.net/kas/static/kp.js' : 
+            '//t1.daumcdn.net/kas/static/kp.dev.min.js',
+        targetPage: isCBT ? 'index.html' : 'cbt_event.html',
+        buttonText: isCBT ? 'Sandbox에서 발생시키기' : 'CBT에서 발생시키기',
+        buttonId: isCBT ? 'sandboxBtn' : 'cbtBtn'
+    };
+}
 
 // DOM 로드 완료 후 실행
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventHandlers();
-    initializeCbtButton();
+    initializeNavigationButton();
 });
 
 // 버튼 활성화 상태 검사 함수
@@ -40,7 +65,8 @@ function validateTrackId() {
     let trackId = document.getElementById('trackId');
     
     if (!trackId.value) {
-        showResult('오류: Track ID는 필수 입력 항목입니다.', false);
+        const env = getEnvironmentConfig();
+        showResult(`${env.envPrefix}오류: Track ID는 필수 입력 항목입니다.`, false);
         return false;
     }
     
@@ -302,15 +328,12 @@ function isMobile() {
 }
 
 // 새 창에서 이벤트 실행하는 함수
-function executeEventInNewWindow(eventType, trackId, eventData, isProduction = false) {
-    // Phase별 스크립트 URL 결정
-    const scriptSrc = isProduction ? 
-        '//t1.daumcdn.net/kas/static/kp.js' : 
-        '//t1.daumcdn.net/kas/static/kp.dev.min.js';
+function executeEventInNewWindow(eventType, trackId, eventData) {
+    const env = getEnvironmentConfig();
     
     // 모바일에서는 팝업 차단 가능성이 높으므로 같은 창에서 실행
     if (isMobile()) {
-        executeEventInSamePage(eventType, trackId, eventData, isProduction);
+        executeEventInSamePage(eventType, trackId, eventData);
         return;
     }
     
@@ -320,8 +343,8 @@ function executeEventInNewWindow(eventType, trackId, eventData, isProduction = f
     // 팝업이 차단된 경우 처리
     if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
         console.warn('팝업이 차단되어 같은 창에서 이벤트를 실행합니다.');
-        showResult('팝업이 차단되어 같은 창에서 이벤트를 실행합니다.', false);
-        executeEventInSamePage(eventType, trackId, eventData, isProduction);
+        showResult(`${env.envPrefix}팝업이 차단되어 같은 창에서 이벤트를 실행합니다.`, false);
+        executeEventInSamePage(eventType, trackId, eventData);
         return;
     }
     
@@ -396,13 +419,13 @@ function executeEventInNewWindow(eventType, trackId, eventData, isProduction = f
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>카카오 픽셀 이벤트 실행 - ${eventType}</title>
-    <script type="text/javascript" charset="UTF-8" src="${scriptSrc}"></script>
+    <title>카카오 픽셀 이벤트 실행 - ${eventType}${env.envText}</title>
+    <script type="text/javascript" charset="UTF-8" src="${env.scriptUrl}"></script>
     <style>
         body { 
             font-family: Arial, sans-serif; 
             padding: 20px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: ${env.theme.gradient};
             color: white;
             text-align: center;
         }
@@ -434,10 +457,10 @@ function executeEventInNewWindow(eventType, trackId, eventData, isProduction = f
 </head>
 <body>
     <div class="container">
-        <h1>🚀 카카오 픽셀 이벤트 실행</h1>
+        <h1>🚀 카카오 픽셀 이벤트 실행${env.envText}</h1>
         <p><strong>이벤트 타입:</strong> ${eventType}</p>
         <p><strong>Track ID:</strong> ${trackId}</p>
-        <p><strong>환경:</strong> ${isProduction ? 'CBT (운영)' : 'Sandbox (개발)'}</p>
+        <p><strong>환경:</strong> ${env.theme.name}</p>
         <div id="loading" style="margin: 20px 0;">
             <div class="loading"></div>
             <p>이벤트 실행 중...</p>
@@ -460,7 +483,7 @@ function executeEventInNewWindow(eventType, trackId, eventData, isProduction = f
                     
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('result').innerHTML = 
-                        '<div class="result success">✅ ${eventType} 이벤트가 성공적으로 실행되었습니다!</div>';
+                        '<div class="result success">✅${env.envText} ${eventType} 이벤트가 성공적으로 실행되었습니다!</div>';
                     
                     console.log('✅ [새 창 이벤트] ${eventType} 실행 완료');
                     
@@ -490,11 +513,13 @@ function executeEventInNewWindow(eventType, trackId, eventData, isProduction = f
 }
 
 // 같은 페이지에서 이벤트 실행하는 함수 (모바일/팝업 차단 대응)
-function executeEventInSamePage(eventType, trackId, eventData, isProduction = false) {
+function executeEventInSamePage(eventType, trackId, eventData) {
+    const env = getEnvironmentConfig();
+    
     console.log(`📱 [같은 창 실행] ${eventType} 이벤트를 같은 창에서 실행합니다.`);
     
     // 토스트 메시지로 실행 상태 표시
-    showResult(`[${isMobile() ? '모바일' : '팝업차단'}] ${eventType} 이벤트를 같은 창에서 실행합니다.`, true);
+    showResult(`${env.envPrefix}${isMobile() ? '모바일' : '팝업차단'} ${eventType} 이벤트를 같은 창에서 실행합니다.`, true);
     
     try {
         // 이벤트별 실행 로직
@@ -574,23 +599,24 @@ function executeEventInSamePage(eventType, trackId, eventData, isProduction = fa
         
         // 3초 후 성공 메시지 표시
         setTimeout(() => {
-            showResult(`✅ ${eventType} 이벤트가 성공적으로 실행되었습니다!`, true);
+            showResult(`${env.envPrefix}✅ ${eventType} 이벤트가 성공적으로 실행되었습니다!`, true);
         }, 1000);
         
     } catch(error) {
         console.error(`❌ [같은 창 실행] ${eventType} 실행 오류:`, error);
-        showResult(`❌ 오류: ${error.message}`, false);
+        showResult(`${env.envPrefix}❌ 오류: ${error.message}`, false);
     }
 }
 
 // 메인 이벤트 실행 함수
 function executeEvent() {
+    const env = getEnvironmentConfig();
     const data = collectInputData();
     
     if (!data.trackId) return;
     
     if (!data.eventType) {
-        showResult('오류: 이벤트 타입을 선택해주세요.', false);
+        showResult(`${env.envPrefix}오류: 이벤트 타입을 선택해주세요.`, false);
         return;
     }
     
@@ -686,191 +712,50 @@ function executeEvent() {
         trackId: data.trackId,
         eventData: eventData,
         timestamp: new Date().toISOString(),
-        environment: 'Sandbox'
+        environment: env.theme.name
     });
     
-    // 새 창에서 이벤트 실행 (Sandbox 환경)
-    executeEventInNewWindow(data.eventType, data.trackId, eventData, false);
+    // 새 창에서 이벤트 실행
+    executeEventInNewWindow(data.eventType, data.trackId, eventData);
     
     // 기존 방식의 토스트 알림
-    showResult(`${data.eventType} 이벤트를 새 창에서 실행합니다.`, true);
+    showResult(`${env.envPrefix}${data.eventType} 이벤트를 새 창에서 실행합니다.`, true);
 }
 
-// 페이지 뷰 이벤트
-function executePageView(data, logData) {
-    if (data.tag) {
-        logData.tag = data.tag;
-        console.log('🔍 [카카오 픽셀 이벤트] 방문 (태그 포함)', logData);
-        kakaoPixel(data.trackId).pageView(data.tag);
-        showResult(`방문 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
-    } else {
-        console.log('🔍 [카카오 픽셀 이벤트] 방문', logData);
-        kakaoPixel(data.trackId).pageView();
-        showResult('방문 이벤트가 실행되었습니다.');
+// 네비게이션 버튼 초기화
+function initializeNavigationButton() {
+    const env = getEnvironmentConfig();
+    const navBtn = document.getElementById(env.buttonId);
+    
+    if (navBtn) {
+        navBtn.addEventListener('click', function() {
+            window.location.href = env.targetPage;
+        });
     }
-}
-
-// 회원가입 이벤트
-function executeCompleteRegistration(data, logData) {
-    // pageView 이벤트 먼저 실행
-    kakaoPixel(data.trackId).pageView();
     
-    if (data.tag) {
-        logData.tag = data.tag;
-        console.log('👤 [카카오 픽셀 이벤트] 회원가입 (태그 포함)', logData);
-        kakaoPixel(data.trackId).completeRegistration(data.tag);
-        showResult(`회원가입 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
-    } else {
-        console.log('👤 [카카오 픽셀 이벤트] 회원가입', logData);
-        kakaoPixel(data.trackId).completeRegistration();
-        showResult('회원가입 이벤트가 실행되었습니다.');
-    }
-}
-
-// 검색 이벤트
-function executeSearch(data, logData) {
-    // pageView 이벤트 먼저 실행
-    kakaoPixel(data.trackId).pageView();
-    
-    const searchData = createSearchData(data);
-    
-    if (searchData) {
-        logData.data = searchData;
-        console.log('🔍 [카카오 픽셀 이벤트] 검색 (데이터 포함)', logData);
-        kakaoPixel(data.trackId).search(searchData);
-        showResult(`검색 이벤트가 데이터와 함께 실행되었습니다: ${JSON.stringify(searchData)}`);
-    } else {
-        console.log('🔍 [카카오 픽셀 이벤트] 검색', logData);
-        kakaoPixel(data.trackId).search();
-        showResult('검색 이벤트가 실행되었습니다.');
-    }
-}
-
-// 컨텐츠 조회 이벤트 (2025.07.18 업데이트 반영)
-function executeViewContent(data, logData) {
-    // pageView 이벤트 먼저 실행
-    kakaoPixel(data.trackId).pageView();
-    
-    const productData = createProductData(data);
-    
-    if (productData) {
-        logData.data = productData;
-        console.log('👁️ [카카오 픽셀 이벤트] 컨텐츠 조회 (신규 형식)', logData);
-        kakaoPixel(data.trackId).viewContent(productData);
-        showResult(`컨텐츠 조회 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
-    } else {
-        console.log('👁️ [카카오 픽셀 이벤트] 컨텐츠 조회', logData);
-        kakaoPixel(data.trackId).viewContent();
-        showResult('컨텐츠 조회 이벤트가 실행되었습니다.');
-    }
-}
-
-// 위시리스트 추가 이벤트 (2025.07.18 업데이트 반영)
-function executeAddToWishList(data, logData) {
-    // pageView 이벤트 먼저 실행
-    kakaoPixel(data.trackId).pageView();
-    
-    const productData = createProductData(data);
-    
-    if (productData) {
-        logData.data = productData;
-        console.log('❤️ [카카오 픽셀 이벤트] 위시리스트 추가 (신규 형식)', logData);
-        kakaoPixel(data.trackId).addToWishList(productData);
-        showResult(`위시리스트 추가 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
-    } else {
-        console.log('❤️ [카카오 픽셀 이벤트] 위시리스트 추가', logData);
-        kakaoPixel(data.trackId).addToWishList();
-        showResult('위시리스트 추가 이벤트가 실행되었습니다.');
-    }
-}
-
-// 장바구니 추가 이벤트 (2025.07.18 업데이트 반영)
-function executeAddToCart(data, logData) {
-    // pageView 이벤트 먼저 실행
-    kakaoPixel(data.trackId).pageView();
-    
-    const productData = createProductData(data);
-    
-    if (productData) {
-        logData.data = productData;
-        console.log('🛒 [카카오 픽셀 이벤트] 장바구니 추가 (신규 형식)', logData);
-        kakaoPixel(data.trackId).addToCart(productData);
-        showResult(`장바구니 추가 이벤트가 신규 형식으로 실행되었습니다: ${JSON.stringify(productData)}`);
-    } else {
-        console.log('🛒 [카카오 픽셀 이벤트] 장바구니 추가', logData);
-        kakaoPixel(data.trackId).addToCart();
-        showResult('장바구니 추가 이벤트가 실행되었습니다.');
-    }
-}
-
-// 장바구니 조회 이벤트
-function executeViewCart(data, logData) {
-    // pageView 이벤트 먼저 실행
-    kakaoPixel(data.trackId).pageView();
-    
-    if (data.tag) {
-        logData.tag = data.tag;
-        console.log('🛒 [카카오 픽셀 이벤트] 장바구니 조회 (태그 포함)', logData);
-        kakaoPixel(data.trackId).viewCart(data.tag);
-        showResult(`장바구니 조회 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
-    } else {
-        console.log('🛒 [카카오 픽셀 이벤트] 장바구니 조회', logData);
-        kakaoPixel(data.trackId).viewCart();
-        showResult('장바구니 조회 이벤트가 실행되었습니다.');
-    }
-}
-
-// 구매 이벤트 (2025.07.18 업데이트 반영, brand 매개변수 포함)
-function executePurchase(data, logData) {
-    // pageView 이벤트 먼저 실행
-    kakaoPixel(data.trackId).pageView();
-    
-    const purchaseData = createPurchaseData(data);
-    
-    if (purchaseData) {
-        logData.data = purchaseData;
-        console.log('💳 [카카오 픽셀 이벤트] 구매 (신규 형식, brand 포함)', logData);
-        kakaoPixel(data.trackId).purchase(purchaseData);
-        showResult(`구매 이벤트가 신규 형식으로 실행되었습니다 (brand 포함): ${JSON.stringify(purchaseData)}`);
-    } else {
-        if (data.tag) {
-            logData.tag = data.tag;
-            console.log('💳 [카카오 픽셀 이벤트] 구매 (태그)', logData);
-            kakaoPixel(data.trackId).purchase(data.tag);
-            showResult(`구매 이벤트가 태그 "${data.tag}"와 함께 실행되었습니다.`);
-        } else {
-            console.log('💳 [카카오 픽셀 이벤트] 구매', logData);
-            kakaoPixel(data.trackId).purchase();
-            showResult('구매 이벤트가 실행되었습니다.');
-        }
+    // Fixed Event 버튼 초기화 (index.html에서만 - CBT 페이지에서는 예외처리)
+    const fixedEventBtn = document.getElementById('fixedEventBtn');
+    if (fixedEventBtn) {
+        fixedEventBtn.addEventListener('click', function() {
+            console.log('Fixed Event 버튼 클릭됨');
+            alert('Fixed Event 버튼 클릭 - 이동 시도');
+            window.location.href = 'fixed_event.html';
+        });
+    } else if (!env.isCBT) {
+        // CBT 환경이 아닌 경우에만 오류 로그 출력
+        console.error('fixedEventBtn 요소를 찾을 수 없음');
     }
 }
 
 // 카카오 픽셀 스크립트 로드 확인
 function checkKakaoPixelLoaded() {
+    const env = getEnvironmentConfig();
+    
     if (typeof kakaoPixel === 'undefined') {
-        showResult('카카오 픽셀 스크립트가 로드되지 않았습니다. 페이지를 새로고침해주세요.', false);
+        showResult(`${env.envPrefix}카카오 픽셀 스크립트가 로드되지 않았습니다. 페이지를 새로고침해주세요.`, false);
         return false;
     }
     return true;
-}
-
-// CBT 버튼 초기화
-function initializeCbtButton() {
-    const cbtBtn = document.getElementById('cbtBtn');
-    if (cbtBtn) {
-        cbtBtn.addEventListener('click', function() {
-            window.location.href = 'cbt_event.html';
-        });
-    }
-    
-    // Fixed Event 버튼 초기화
-    const fixedEventBtn = document.getElementById('fixedEventBtn');
-    if (fixedEventBtn) {
-        fixedEventBtn.addEventListener('click', function() {
-            window.location.href = 'fixed_event.html';
-        });
-    }
 }
 
 // 페이지 로드 시 스크립트 확인
