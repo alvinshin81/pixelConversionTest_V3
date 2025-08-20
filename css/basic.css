@@ -5,12 +5,23 @@ body {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #f5f5f5;
+    background: 
+        linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
+        url('../rsc/background.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     padding-top: 160px;
 }
 
 .container {
-    background-color: white;
+    background: 
+        linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+        url('../rsc/background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
