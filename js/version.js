@@ -1,7 +1,7 @@
 // 버전 관리 JavaScript (통합 버전)
 
 // 현재 버전 정의 (단일 관리 지점)
-const CURRENT_VERSION = 'V20250806.1443';
+const CURRENT_VERSION = 'V20250918.1454';
 
 // 버전 뱃지 동적 생성 함수
 function insertVersionBadge() {
